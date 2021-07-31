@@ -1,6 +1,8 @@
 <template>
  <div class="login-container">
-    <van-nav-bar class="page-nav-bar" title="Sign in / Sign up" />
+    <van-nav-bar class="page-nav-bar" title="Sign in / Sign up">
+      <van-icon slot="left" name="cross" @click="$router.back()"/>
+    </van-nav-bar>
   <van-form @submit="onSubmit" ref="loginFormRef">
     <!-- 使用vant自带图标 此时van-field是自闭合标签 rules是表单预验证-->
     <van-field
@@ -98,6 +100,7 @@ export default {
         this.$store.commit('setUser', data.data)
         // if new toast actived, old toast will be closed automatically
         this.$toast.success('Success')
+        this.$router.back()
       } catch (err) {
         //   这是后台数据校验
         if (err.response.status === 400) {
