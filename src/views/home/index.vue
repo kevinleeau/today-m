@@ -3,6 +3,7 @@
     <van-nav-bar class="page-nav-bar" fixed>
       <van-button class="search-btn" slot="title" type="info" size="small" round icon="search">Search</van-button>
     </van-nav-bar>
+    <!-- v-model绑定当前激活标签 -->
     <van-tabs class="channel-tabs" v-model="active" animated swipeable>
       <van-tab v-for="channel in channels" :key="channel.id" :title="channel.name">
         <!-- ************************************************************ -->
@@ -11,23 +12,38 @@
         <article-list :channel="channel" />
       </van-tab>
       <div slot="nav-right" class="placeholder"></div>
-      <div slot="nav-right" class="hambuger-btn">
+      <div slot="nav-right" class="hambuger-btn" @click="isEditChannelShow=true">
         <i class="iconfont icon-a-listview"></i>
       </div>
     </van-tabs>
+    <!-- edit channels popup -->
+    <van-popup
+     v-model="isEditChannelShow"
+     closeable
+     close-icon-position="top-left"
+     position="bottom"
+     :style="{ height: '100%' }">
+     <!-- 当用户点击按钮弹出编辑框，编辑框里面的内容为一个组件，在这里使用容器占用 把这里的channels赋值给my-channels并且传出去给其它组件使用，把active的标签也传出去-->
+     <!-- @update-active是子组件传过来的事件，监听后触发onupdate函数 -->
+     <ChannelEdit :my-channels="channels" :active="active" @update-active="onupdate"/>
+    </van-popup>
 </div>
 </template>
 
 <script>
 import { getUserChannels } from '@/api/user.js'
 import ArticleList from '@/views/home/components/article-list.vue'
+import ChannelEdit from '@/views/home/components/channel-edit.vue'
+import { mapState } from 'vuex'
+import { getItem } from '@/utils/storage.js'
 export default {
   name: 'HomeIndex',
-  components: { ArticleList },
+  components: { ArticleList, ChannelEdit },
   data () {
     return {
       active: 0,
-      channels: []
+      channels: [],
+      isEditChannelShow: false
     }
   },
   created () {
@@ -36,12 +52,33 @@ export default {
   methods: {
     async loadChannels () {
       try {
-        const { data } = await getUserChannels()
-        this.channels = data.data.channels
+        let channels = []
+        // conditions: if login, server request, if not login, get localStorage data
+        if (this.user) {
+          const { data } = await getUserChannels()
+          channels = data.data.channels
+        } else {
+          const localChannels = getItem('key')
+          if (localChannels) {
+            channels = localChannels
+          } else {
+            const { data } = await getUserChannels()
+            channels = data.data.channels
+          }
+        }
+        this.channels = channels
       } catch (err) {
         this.$toast('fail to access data from channesl')
       }
+    },
+    // isEditChannelShow当参数传进函数，省略的话默认为true，除非特别指明是false
+    onupdate (index, isEditChannelShow = true) {
+      this.active = index
+      this.isEditChannelShow = isEditChannelShow
     }
+  },
+  computed: {
+    ...mapState(['user'])
   }
 }
 
