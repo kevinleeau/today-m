@@ -13,10 +13,8 @@ import 'amfe-flexible'
 import './styles/index.less'
 import './utils/dayjs.js'
 
-// import enUS from 'vant/es/locale/lang/en-US'
-// Vant.use('en-US', enUS)
-
 Vue.use(Vant)
+
 Vue.prototype.$Local = enUS
 Vue.config.productionTip = false
 

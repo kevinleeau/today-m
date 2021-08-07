@@ -1,7 +1,7 @@
 <template>
 <div class="home-container">
     <van-nav-bar class="page-nav-bar" fixed>
-      <van-button class="search-btn" slot="title" type="info" size="small" round icon="search">Search</van-button>
+      <van-button class="search-btn" slot="title" type="info" size="small" round icon="search" to="/search">Search</van-button>
     </van-nav-bar>
     <!-- v-model绑定当前激活标签 -->
     <van-tabs class="channel-tabs" v-model="active" animated swipeable>
