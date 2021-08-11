@@ -1,5 +1,5 @@
 <template>
-  <van-cell class="article-item">
+  <van-cell class="article-item" :to="`/article/${article.art_id}`">
     <!-- vant的cell可以通过slot在不同位置设置不同的自定义插槽 -->
     <!-- van-multi-ellipsis是vant自带属性，让title最多显示两行，剩余内容用...提示 -->
     <div class="title van-multi-ellipsis--12" slot="title">{{article.title}}</div>

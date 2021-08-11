@@ -1,7 +1,18 @@
 import axios from 'axios'
 import store from '@/store/index.js'
+import jsonBig from 'json-bigint'
+// jsonBig.parse() json to js Object, then .tostring()
+// jsonBig.stringify() js Object to json
 const request = axios.create({
-  baseURL: 'http://ttapi.research.itcast.cn/'
+  baseURL: 'http://ttapi.research.itcast.cn/',
+  // 自定义后台返回的数据格式，后台数据格式可能多样，所以使用try & catch
+  transformResponse: [function (data) {
+    try {
+      jsonBig.parse(data)
+    } catch (err) {
+      return data
+    }
+  }]
 })
 
 // 请求拦截器

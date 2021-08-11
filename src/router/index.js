@@ -10,6 +10,7 @@ Vue.use(VueRouter)
 //     #2.3 child video routes: src -> views -> video
 //     #2.4 child setting routes: src -> views -> setting
 //  #3 /search routes: src -> views -> search
+//  #4 /article routes: src -> views -> article
 
 const routes = [
   { path: '/login', name: 'login', component: () => import('@/views/login') },
@@ -25,7 +26,9 @@ const routes = [
       { path: '/setting', name: 'setting', component: () => import('@/views/setting') }
     ]
   },
-  { path: '/search', name: 'search', component: () => import('@/views/search') }
+  { path: '/search', name: 'search', component: () => import('@/views/search') },
+  // 开启路由传参，把路由参数映射到组件中去
+  { path: '/article/:articleId', name: 'article', component: () => import('@/views/article'), props: true }
 ]
 
 const router = new VueRouter({
