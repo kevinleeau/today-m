@@ -40,7 +40,7 @@ export default {
           status = 1
         }
         this.$emit('input', status)
-        this.$toast.success(this.status === 1 ? 'Article Liked' : 'Article Unliked')
+        this.$toast.success(status === 1 ? 'Article Liked' : 'Article Unliked')
       } catch (err) {
         this.$toast.fail('fail to update')
       }

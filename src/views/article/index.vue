@@ -68,7 +68,14 @@
 
        </van-cell>
        <div class="article-content markdown-body" v-html="article.content" ref="article.content"></div>
-       <van-divider></van-divider>
+       <van-divider>Article End</van-divider>
+       <!-- @commentData from child and ressign totalCommentCount's value to $event.total_count -->
+       <!-- 在根组件监听到孙组件发过来的replyClick事件，并交给handleReply处理 -->
+       <CommentList
+       :articleId="article.art_id"
+       :list="commentList"
+       @commentData="totalCommentCount = $event.total_count"
+       @replyClick="handleReply"/>
      </div>
      <div v-else-if="errorType === 404" class="error-wrap">
        <van-icon name="failure"/>
@@ -84,11 +91,20 @@
        class="comment-btn"
        type="default"
        round
-       size="small">Comment</van-button>
+       size="small"
+       @click="isPostShow=true">Comment</van-button>
+
+           <!-- ****comment popup section，在popup里面包含子组件**** -->
+           <!-- 父组件的article.art_id传给子组件，子组件请求数据成功后生成updatePost事件，并携带后台数据，被父组件监听到，交给handlePost处理 -->
+       <van-popup v-model="isPostShow" position="bottom">
+         <CommentPost :targetId="article.art_id" @updatePost="handlePost"/>
+       </van-popup>
+
+       <!-- // 在父组件info使用子组件请求回来的数据 -->
        <van-icon
        class="comment-icon"
        name="comment-o"
-       info="123"
+       :info="totalCommentCount"
        color="#777"/>
        <!-- 对于需要传递并修改的子组件数据用v-model绑定，对于article.id则单独传递 -->
        <CollectArticle class="btn-item" v-model="article.is_collected" :articleId="article.art_id"/>
@@ -96,6 +112,15 @@
        <van-icon name="share"></van-icon>
      </div>
    </div>
+   <!-- ***************** -->
+   <!-- 控制弹窗是在孙组件comment-item.vue里触发的 -->
+   <van-popup v-model="isReplyShow" position="bottom" style="height: 100%;">
+    <!-- 因为popup是切换渲染，里面的内容默认不变，所以用v-if判断，当popup关闭后不渲染里面的子组件，only when isReplyShow true, CommentReply will be 触发 -->
+    <CommentReply
+    v-if="isReplyShow"
+    :currentComment="currentComment"
+    @close="isReplyShow=false"/>
+   </van-popup>
  </div>
 </template>
 
@@ -106,12 +131,26 @@ import { ImagePreview } from 'vant'
 import FollowUser from '@/components/follow-user'
 import CollectArticle from '@/components/collect-article/index.vue'
 import LikeArticle from '@/components/like-article/index.vue'
+//      ./当前目录     @/根目录
+import CommentList from './components/comment-list.vue'
+import CommentPost from './components/comment-post.vue'
+import CommentReply from './components/comment-reply.vue'
 export default {
   name: 'ArticleIndex',
   components: {
     FollowUser,
     CollectArticle,
-    LikeArticle
+    LikeArticle,
+    CommentList,
+    CommentPost,
+    CommentReply
+  },
+  // 依赖注入，给所有的后代组件提供articleId，这个数据从this.articleId里来
+  // 根组件里用provide提供，后代组件里用inject接收
+  provide: function () {
+    return {
+      articleId: this.articleId
+    }
   },
   props: {
     // 接收将要渲染的article的id，可能是多种类型数据，这个数据从**路由**携带过来
@@ -126,7 +165,13 @@ export default {
       loading: true,
       // 请求失败有2种可能，1：后台不存在这个id数据(404)，2：网络问题
       errorType: 0,
-      followLoading: false
+      followLoading: false,
+      // 在父组件中使用子组件请求回来的数据，预定义为0
+      totalCommentCount: 0,
+      isPostShow: false,
+      commentList: [],
+      isReplyShow: false,
+      currentComment: {}
     }
   },
   created () {
@@ -164,7 +209,11 @@ export default {
           })
         }
       })
-    }
+    },
+    handlePost (data) {
+      this.isPostShow = false
+      this.commentList.unshift(data.new_obj)
+    },
     // 同一个函数判断是否已关注，分别调用不同处理方法
     // in case internet speed slow，set loading to true to remind user that request is on the way, to prevent multi request
     // async onFollow () {
@@ -186,6 +235,13 @@ export default {
     //   }
     //   this.followLoading = false
     // }
+
+    // ***************
+    // 这个comment从孙组件comment-item来，传到父组件comment-list，再到根组件这里，在这里赋值给currentComment后，再次传给另一个子组件comment-reply使用
+    handleReply (comment) {
+      this.isReplyShow = true
+      this.currentComment = comment
+    }
   }
 }
 
