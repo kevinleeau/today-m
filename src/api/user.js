@@ -51,3 +51,26 @@ export const unFollow = (target) => {
     url: `/app/v1_0/user/followings/${target}`
   })
 }
+// get current user profile details
+export const getUserProfile = (target) => {
+  return request({
+    method: 'GET',
+    url: '/app/v1_0/user/profile'
+  })
+}
+// update current user profile details
+export const updateUserProfile = (data) => {
+  return request({
+    method: 'PATCH',
+    url: '/app/v1_0/user/profile',
+    data: data
+  })
+}
+// upload current user photo
+export const updateUserPhoto = (data) => {
+  return request({
+    method: 'PATCH',
+    url: '/app/v1_0/user/photo',
+    data: data
+  })
+}

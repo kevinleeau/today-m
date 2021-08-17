@@ -115,7 +115,7 @@
    <!-- ***************** -->
    <!-- 控制弹窗是在孙组件comment-item.vue里触发的 -->
    <van-popup v-model="isReplyShow" position="bottom" style="height: 100%;">
-    <!-- 因为popup是切换渲染，里面的内容默认不变，所以用v-if判断，当popup关闭后不渲染里面的子组件，only when isReplyShow true, CommentReply will be 触发 -->
+    <!-- 因为popup是切换渲染，里面的内容默认不变，所以用v-if判断，当popup关闭后不渲染里面的子组件，Only when van-popup 的 isReplyShow true, CommentReply 才会被 触发 -->
     <CommentReply
     v-if="isReplyShow"
     :currentComment="currentComment"
